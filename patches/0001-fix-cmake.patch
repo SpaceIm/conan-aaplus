@@ -1,0 +1,55 @@
+--- a/CMakeLists_old.txt
++++ b/CMakeLists.txt
+@@ -2,8 +2,6 @@ PROJECT (AstronomicalAlgorithms)
+ 
+ cmake_minimum_required(VERSION 3.8)
+ 
+-SET(CMAKE_CXX_STANDARD 17)
+-SET(CMAKE_CXX_STANDARD_REQUIRED ON)
+ 
+ #-----------------------------------------------------------------------------
+ # Output directories.
+@@ -133,7 +131,6 @@ SET ( SRCS_LIB
+   AAVSOP87_SAT.cpp
+   AAVSOP87_URA.cpp
+   AAVSOP87_VEN.cpp
+-  stdafx.cpp
+ )
+ 
+ #-----------------------------------------------------------------------------
+@@ -252,7 +249,6 @@ SET ( INCS
+   AAVSOP87_SAT.h
+   AAVSOP87_URA.h
+   AAVSOP87_VEN.h
+-  stdafx.h
+ )
+ 
+ SET ( SRCS
+@@ -262,18 +258,19 @@ SET ( SRCS
+ #-----------------------------------------------------------------------------
+ # Executables.
+ #-----------------------------------------------------------------------------
+-ADD_EXECUTABLE(AATest ${SRCS} )
+ 
+ #-----------------------------------------------------------------------------
+ # Libraries.
+-ADD_LIBRARY(aaplus-static STATIC ${SRCS_LIB} ${INCS})
+-SET_TARGET_PROPERTIES(aaplus-static PROPERTIES OUTPUT_NAME "aaplus")
++ADD_LIBRARY(aaplus ${SRCS_LIB})
++set_target_properties(aaplus PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
++target_compile_features(aaplus PUBLIC cxx_std_17)
+ 
+-ADD_LIBRARY(aaplus-shared SHARED ${SRCS_LIB} ${INCS})
+-SET_TARGET_PROPERTIES(aaplus-shared PROPERTIES OUTPUT_NAME "aaplus")
+ 
+-install(TARGETS aaplus-shared aaplus-static 
+-		DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" )
++install(TARGETS aaplus
++        RUNTIME DESTINATION bin
++        ARCHIVE DESTINATION lib
++        LIBRARY DESTINATION lib
++)
++install(FILES ${INCS} DESTINATION include)
+ 
+-TARGET_LINK_LIBRARIES(AATest aaplus-static)
+ 
