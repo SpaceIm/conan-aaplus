@@ -25,7 +25,7 @@
  )
  
  SET ( SRCS
-@@ -262,18 +258,19 @@ SET ( SRCS
+@@ -262,18 +258,22 @@ SET ( SRCS
  #-----------------------------------------------------------------------------
  # Executables.
  #-----------------------------------------------------------------------------
@@ -38,6 +38,9 @@
 +ADD_LIBRARY(aaplus ${SRCS_LIB})
 +set_target_properties(aaplus PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
 +target_compile_features(aaplus PUBLIC cxx_std_17)
++if(WIN32)
++    target_link_libraries(aaplus PRIVATE ws2_32)
++endif()
  
 -ADD_LIBRARY(aaplus-shared SHARED ${SRCS_LIB} ${INCS})
 -SET_TARGET_PROPERTIES(aaplus-shared PROPERTIES OUTPUT_NAME "aaplus")
