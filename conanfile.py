@@ -87,5 +87,8 @@ class Aaplusconan(ConanFile):
 
     def package_info(self):
         self.cpp_info.libs = ["aaplus"]
-        if not self.options.shared and self.settings.os == "Windows":
-            self.cpp_info.system_libs.append("ws2_32")
+        if not self.options.shared:
+            if self.settings.os == "Windows":
+                self.cpp_info.system_libs.append("ws2_32")
+            if self.settings.compiler == "gcc" and tools.Version(self.settings.compiler.version) < "9":
+                self.cpp_info.system_libs.append("stdc++fs")

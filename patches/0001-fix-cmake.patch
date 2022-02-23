@@ -72,7 +72,7 @@
  )
  
  SET ( SRCS
-@@ -262,18 +267,31 @@ SET ( SRCS
+@@ -262,18 +267,32 @@ SET ( SRCS
  #-----------------------------------------------------------------------------
  # Executables.
  #-----------------------------------------------------------------------------
@@ -84,9 +84,10 @@
 -SET_TARGET_PROPERTIES(aaplus-static PROPERTIES OUTPUT_NAME "aaplus")
 +add_library(aaplus ${SRCS_LIB})
 +target_compile_features(aaplus PUBLIC cxx_std_17)
-+if(WIN32)
-+    target_link_libraries(aaplus PRIVATE ws2_32)
-+endif()
++target_link_libraries(aaplus PRIVATE
++    $<$<PLATFORM_ID:Windows>:ws2_32>
++    $<$<AND:$<CXX_COMPILER_ID:GNU>,$<VERSION_LESS:$<CXX_COMPILER_VERSION>,9.0>>:stdc++fs>
++)
 +if(BUILD_SHARED_LIBS)
 +    set_target_properties(aaplus PROPERTIES
 +        CXX_VISIBILITY_PRESET hidden
