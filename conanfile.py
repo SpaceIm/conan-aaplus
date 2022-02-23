@@ -1,6 +1,7 @@
 from conans import ConanFile, CMake, tools
 from conans.errors import ConanInvalidConfiguration
 import functools
+import os
 
 required_conan_version = ">=1.33.0"
 
@@ -81,9 +82,15 @@ class Aaplusconan(ConanFile):
         cmake.build()
 
     def package(self):
-        self.copy("AA+.htm", dst="licenses", src=self._source_subfolder)
+        tools.save(os.path.join(self.package_folder, "licenses", "LICENSE"), self._extract_license())
         cmake = self._configure_cmake()
         cmake.install()
+
+    def _extract_license(self):
+        aaplus_header = tools.load(os.path.join(self._source_subfolder, "AA+.h"))
+        begin = aaplus_header.find("Copyright")
+        end = aaplus_header.find("*/", begin)
+        return aaplus_header[begin:end]
 
     def package_info(self):
         self.cpp_info.libs = ["aaplus"]
