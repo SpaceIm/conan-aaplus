@@ -1,4 +1,5 @@
 from conans import ConanFile, CMake, tools
+from conans.errors import ConanInvalidConfiguration
 import functools
 
 required_conan_version = ">=1.33.0"
@@ -44,9 +45,24 @@ class Aaplusconan(ConanFile):
         if self.options.shared:
             del self.options.fPIC
 
+    @property
+    def _compilers_minimum_version(self):
+        return {
+            "gcc": "8",
+            "clang": "9",
+            "apple-clang": "11",
+            "Visual Studio": "16",
+        }
+
     def validate(self):
         if self.settings.compiler.get_safe("cppstd"):
-            tools.check_min_cppstd(self, 17)
+            tools.check_min_cppstd(self, "17")
+
+        minimum_version = self._compilers_minimum_version.get(str(self.settings.compiler), False)
+        if minimum_version and tools.Version(self.settings.compiler.version) < minimum_version:
+            raise ConanInvalidConfiguration(
+                "{} requires C++17, which your compiler does not support.".format(self.name)
+            )
 
     def source(self):
         tools.get(**self.conan_data["sources"][self.version],
