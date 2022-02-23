@@ -9,7 +9,7 @@
  
  #-----------------------------------------------------------------------------
  # Output directories.
-@@ -133,7 +131,6 @@ SET ( SRCS_LIB
+@@ -133,12 +131,11 @@ SET ( SRCS_LIB
    AAVSOP87_SAT.cpp
    AAVSOP87_URA.cpp
    AAVSOP87_VEN.cpp
@@ -17,7 +17,54 @@
  )
  
  #-----------------------------------------------------------------------------
-@@ -252,7 +249,6 @@ SET ( INCS
+ SET ( INCS
+-#  AA+.h
++  AA+.h
+   AA2DCoordinate.h
+   AA3DCoordinate.h
+   AAAberration.h
+@@ -149,6 +146,8 @@ SET ( INCS
+   AADefines.h
+   AADiameters.h
+   AADynamicalTime.h
++  AAELP2000.h
++  AAELPMPP02.h
+   AAEarth.h
+   AAEaster.h
+   AAEclipses.h
+@@ -157,6 +156,7 @@ SET ( INCS
+   AAElliptical.h
+   AAEquationOfTime.h
+   AAEquinoxesAndSolstices.h
++  AAEquinoxesAndSolstices2.h
+   AAFK5.h
+   AAGalileanMoons.h
+   AAGlobe.h
+@@ -170,10 +170,15 @@ SET ( INCS
+   AAMoon.h
+   AAMoonIlluminatedFraction.h
+   AAMoonMaxDeclinations.h
++  AAMoonMaxDeclinations2.h
+   AAMoonNodes.h
++  AAMoonNodes2.h
+   AAMoonPerigeeApogee.h
++  AAMoonPerigeeApogee2.h
+   AAMoonPhases.h
++  AAMoonPhases2.h
+   AAMoslemCalendar.h
++  AANearParabolic.h
+   AANeptune.h
+   AANodes.h
+   AANutation.h
+@@ -192,6 +197,7 @@ SET ( INCS
+   AAPrecession.h
+   AARefraction.h
+   AARiseTransitSet.h
++  AARiseTransitSet2.h
+   AASaturn.h
+   AASaturnMoons.h
+   AASaturnRings.h
+@@ -252,7 +258,6 @@ SET ( INCS
    AAVSOP87_SAT.h
    AAVSOP87_URA.h
    AAVSOP87_VEN.h
@@ -25,7 +72,7 @@
  )
  
  SET ( SRCS
-@@ -262,18 +258,22 @@ SET ( SRCS
+@@ -262,18 +267,31 @@ SET ( SRCS
  #-----------------------------------------------------------------------------
  # Executables.
  #-----------------------------------------------------------------------------
@@ -35,11 +82,21 @@
  # Libraries.
 -ADD_LIBRARY(aaplus-static STATIC ${SRCS_LIB} ${INCS})
 -SET_TARGET_PROPERTIES(aaplus-static PROPERTIES OUTPUT_NAME "aaplus")
-+ADD_LIBRARY(aaplus ${SRCS_LIB})
-+set_target_properties(aaplus PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
++add_library(aaplus ${SRCS_LIB})
 +target_compile_features(aaplus PUBLIC cxx_std_17)
 +if(WIN32)
 +    target_link_libraries(aaplus PRIVATE ws2_32)
++endif()
++if(BUILD_SHARED_LIBS)
++    set_target_properties(aaplus PROPERTIES
++        CXX_VISIBILITY_PRESET hidden
++        VISIBILITY_INLINES_HIDDEN TRUE
++    )
++    if(WIN32)
++        target_compile_definitions(aaplus PRIVATE "AAPLUS_EXT_CLASS=__declspec(dllexport)")
++    else()
++        target_compile_definitions(aaplus PRIVATE "AAPLUS_EXT_CLASS=__attribute__((visibility(\"default\")))")
++    endif()
 +endif()
  
 -ADD_LIBRARY(aaplus-shared SHARED ${SRCS_LIB} ${INCS})
@@ -50,8 +107,7 @@
 +install(TARGETS aaplus
 +        RUNTIME DESTINATION bin
 +        ARCHIVE DESTINATION lib
-+        LIBRARY DESTINATION lib
-+)
++        LIBRARY DESTINATION lib)
 +install(FILES ${INCS} DESTINATION include)
  
 -TARGET_LINK_LIBRARIES(AATest aaplus-static)
